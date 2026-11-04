@@ -10,6 +10,25 @@ chai.use(chaiHttp);
 
 const { expect } = chai;
 
+describe('Testando os cabeçalhos e parâmetros', () => {
+  it('Não anuncia o Express e pede ao navegador que não adivinhe o tipo do conteúdo', async () => {
+    const response = await chai.request(app).get('/rota-que-nao-existe');
+
+    expect(response.header['x-powered-by']).to.not.exist;
+    expect(response.header['x-content-type-options']).to.be.equal('nosniff');
+  });
+
+  it('Um id que não é um número inteiro positivo retorna 400 sem consultar o banco', async () => {
+    const responses = await Promise.all(['/teams/1%20OR%201=1', '/teams/abc', '/teams/-1', '/teams/1.5']
+      .map((path) => chai.request(app).get(path)));
+
+    responses.forEach((response) => {
+      expect(response.status).to.be.equal(400);
+      expect(response.body).to.deep.equal({ message: 'Invalid id' });
+    });
+  });
+});
+
 describe('Testando CORS', () => {
   it('Responde à origem do front end local', async () => {
     const response = await chai.request(app).options('/login')
