@@ -17,9 +17,15 @@ router.get('/teams', safe(controller.getAllTeams));
 router.get('/teams/:id', safe(controller.getTeamById));
 
 router.get('/matches', safe(controller.getAllMatches));
-router.post('/matches', validate.token, safe(validate.createMatch), safe(controller.createMatch));
-router.patch('/matches/:id/finish', validate.token, safe(controller.finishMatch));
-router.patch('/matches/:id', validate.token, safe(controller.updateMatch));
+router.post(
+  '/matches',
+  validate.token,
+  validate.admin,
+  safe(validate.createMatch),
+  safe(controller.createMatch),
+);
+router.patch('/matches/:id/finish', validate.token, validate.admin, safe(controller.finishMatch));
+router.patch('/matches/:id', validate.token, validate.admin, safe(controller.updateMatch));
 
 router.get('/leaderboard/home', safe(controller.getHomeLeaderboard));
 

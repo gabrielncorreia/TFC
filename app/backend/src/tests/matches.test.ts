@@ -228,4 +228,26 @@ describe('Testando a rota /matches', () => {
     expect(fields).to.deep.equal({ homeTeamGoals: 3, awayTeamGoals: 1 });
     expect(options).to.deep.equal({ where: { id: 1 } });
   });
+
+  it('Um usuário sem papel de admin não cria, edita nem finaliza partidas (403)', async () => {
+    const userToken = new JWT().generateToken({ email: 'user@user.com', role: 'user' });
+    const create = Match.create as sinon.SinonStub;
+    const update = Match.update as sinon.SinonStub;
+    const [createsBefore, updatesBefore] = [create.callCount, update.callCount];
+
+    const responses = await Promise.all([
+      chai.request(app).post('/matches')
+        .send({ homeTeam: 16, awayTeam: 8, homeTeamGoals: 1, awayTeamGoals: 1 })
+        .set({ authorization: userToken }),
+      chai.request(app).patch('/matches/1').send({ homeTeamGoals: 9 }).set({ authorization: userToken }),
+      chai.request(app).patch('/matches/1/finish').set({ authorization: userToken }),
+    ]);
+
+    responses.forEach((response) => {
+      expect(response.status).to.be.equal(403);
+      expect(response.body).to.deep.equal({ message: 'Only admins can change matches' });
+    });
+    expect(create.callCount).to.be.equal(createsBefore);
+    expect(update.callCount).to.be.equal(updatesBefore);
+  });
 });
