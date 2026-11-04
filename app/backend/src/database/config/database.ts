@@ -15,6 +15,8 @@ const config: Options = {
   host: process.env.DB_HOST || 'localhost',
   port: Number(process.env.DB_PORT) || 3002,
   dialect: 'mysql',
+  // Sequelize loads its driver by a computed name, which Vercel's bundler cannot trace; pass it in.
+  dialectModule: require('mysql2'),
   dialectOptions: {
     timezone: 'Z',
     // TiDB Cloud requires TLS; Node's built-in CA store already trusts its certificate.

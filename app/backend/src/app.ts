@@ -1,5 +1,5 @@
-import * as express from 'express';
-import * as cors from 'cors';
+import express from 'express';
+import cors from 'cors';
 import { rateLimit } from 'express-rate-limit';
 import Routes from './routes/backend.routes';
 
