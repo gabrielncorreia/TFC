@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: `http://localhost:${process.env.REACT_APP_API_PORT || '3001'}`,
+  // Set at build time on Vercel; local builds fall back to the Docker API.
+  baseURL: process.env.REACT_APP_API_URL
+    || `http://localhost:${process.env.REACT_APP_API_PORT || '3001'}`,
 });
 
 export const setToken = (token) => {

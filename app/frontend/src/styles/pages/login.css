@@ -84,3 +84,7 @@
   font-style: normal;
   text-align: center;
 }
+
+.user-login-area form p.demo-credentials {
+  color: #002c33;
+}
