@@ -10,6 +10,12 @@ const validate = new Validations();
 const safe = (handler: RequestHandler): RequestHandler => (req, res, next) =>
   Promise.resolve(handler(req, res, next)).catch(next);
 
+// Every :id is a positive integer; anything else is refused before it reaches the database.
+router.param('id', (_req, res, next, id) => {
+  if (!/^[1-9]\d{0,9}$/.test(id)) return res.status(400).json({ message: 'Invalid id' });
+  next();
+});
+
 router.post('/login', validate.login, safe(controller.loginUser));
 router.get('/login/validate', safe(controller.validateUser));
 

@@ -18,6 +18,11 @@ class App {
     // Comma-separated list of front-end origins allowed to call the API.
     const origin = (process.env.CORS_ORIGINS || 'http://localhost:3000').split(',');
 
+    this.app.disable('x-powered-by');
+    this.app.use((_req, res, next) => {
+      res.set('X-Content-Type-Options', 'nosniff');
+      next();
+    });
     this.app.use(cors({ origin }));
     // On Vercel (which sets VERCEL=1) its proxy overwrites X-Forwarded-For, so trust that one hop for the
     // client IP. Elsewhere, such as the Docker image, a client could forge the header to dodge the login limit.
