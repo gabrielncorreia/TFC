@@ -49,10 +49,11 @@
     "typescript": "4.4.4"
   },
   "dependencies": {
+    "bcryptjs": "3.0.3",
     "cors": "2.8.5",
     "dotenv": "10.0.0",
-    "bcryptjs": "3.0.3",
     "express": "4.22.3",
+    "express-rate-limit": "8.7.3",
     "jsonwebtoken": "9.0.3",
     "mysql2": "3.24.6",
     "sequelize": "6.37.8"

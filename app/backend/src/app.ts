@@ -1,5 +1,6 @@
 import * as express from 'express';
 import * as cors from 'cors';
+import { rateLimit } from 'express-rate-limit';
 import Routes from './routes/backend.routes';
 
 class App {
@@ -18,6 +19,16 @@ class App {
     const origin = (process.env.CORS_ORIGINS || 'http://localhost:3000').split(',');
 
     this.app.use(cors({ origin }));
+    // Vercel sits in front of the app; trust its one proxy hop for the client IP.
+    this.app.set('trust proxy', 1);
+    // shortcut: counts per function instance (in memory), so it slows login floods rather than stopping them; use a shared store if that matters.
+    this.app.post('/login', rateLimit({
+      windowMs: 15 * 60 * 1000,
+      limit: Number(process.env.LOGIN_RATE_LIMIT) || 10,
+      standardHeaders: 'draft-8',
+      legacyHeaders: false,
+      message: { message: 'Too many login attempts, try again later' },
+    }));
     this.app.use(express.json()); // Necessário para fazer o parse do body.
     this.app.use(Routes);
     this.app.use(App.errorHandler);

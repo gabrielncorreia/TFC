@@ -1,8 +1,10 @@
 import * as chai from 'chai';
+import * as sinon from 'sinon';
 import * as bcrypt from 'bcryptjs';
 import chaiHttp = require('chai-http');
 
 import { app, App } from '../app';
+import User from '../database/models/User';
 
 chai.use(chaiHttp);
 
@@ -86,6 +88,30 @@ describe('Testando o seeder de usuários', () => {
 
     expect(await bcrypt.compare('secret_admin', admin)).to.be.true;
     expect(await bcrypt.compare('secret_user', user)).to.be.true;
+  });
+});
+
+describe('Testando o limite de tentativas de login', () => {
+  afterEach(() => {
+    sinon.restore();
+    process.env.LOGIN_RATE_LIMIT = '1000';
+  });
+
+  it('Bloqueia a 11ª tentativa de login com 429', async () => {
+    process.env.LOGIN_RATE_LIMIT = '10';
+    const limited = new App().app;
+    sinon.stub(User, 'findOne').resolves(null);
+    const attempt = () => chai.request(limited).post('/login')
+      .send({ email: 'ninguem@admin.com', password: 'chute' });
+
+    for (let i = 0; i < 10; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
+      expect((await attempt()).status).to.be.equal(401);
+    }
+    const blocked = await attempt();
+
+    expect(blocked.status).to.be.equal(429);
+    expect(blocked.body).to.deep.equal({ message: 'Too many login attempts, try again later' });
   });
 });
 
