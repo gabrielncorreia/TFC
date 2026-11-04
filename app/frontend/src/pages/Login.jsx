@@ -57,8 +57,6 @@ const Login = () => {
                 <p>
                   { `${t('login.demoAccount')} ` }
                   <strong>{ DEMO_EMAIL }</strong>
-                  { `${t('login.demoPassword')} ` }
-                  <strong>{ DEMO_PASSWORD }</strong>
                 </p>
                 <button
                   type="button"
