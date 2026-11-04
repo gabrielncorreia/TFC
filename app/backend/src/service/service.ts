@@ -3,6 +3,7 @@ import Teams from '../database/models/Team';
 import Matches from '../database/models/Match';
 import Leaderboard from './leaderboard';
 
+// Database errors are not caught here: they propagate to the error handler in app.ts as a 500.
 export default class Service {
   constructor(
     private user = User,
@@ -10,167 +11,119 @@ export default class Service {
     private match = Matches,
   ) {}
 
-  public getUserByUsernameAndPassword = async (email: string) => {
-    try {
-      const user = await this.user.findOne({
-        where: {
-          email,
+  public getUserByEmail = async (email: string) => {
+    const user = await this.user.findOne({
+      where: {
+        email,
 
-        },
-      });
-      return user;
-    } catch (error) {
-      return error;
-    }
+      },
+    });
+    return user;
   };
 
   public getAllTeams = async () => {
-    try {
-      const teams = await this.team.findAll();
-      return teams;
-    } catch (error) {
-      return error;
-    }
+    const teams = await this.team.findAll();
+    return teams;
   };
 
   public getTeamById = async (id: number) => {
-    try {
-      const team = await this.team.findOne({
-        where: {
-          id,
-        },
-      });
+    const team = await this.team.findOne({
+      where: {
+        id,
+      },
+    });
 
-      return team;
-    } catch (error) {
-      return error;
-    }
+    return team;
   };
 
   public getAllMatches = async () => {
-    try {
-      const allMatches = await this.match.findAll({
-        include: [
-          { model: Teams, as: 'teamHome', attributes: ['teamName'] },
-          { model: Teams, as: 'teamAway', attributes: ['teamName'] },
-        ],
-      });
+    const allMatches = await this.match.findAll({
+      include: [
+        { model: Teams, as: 'teamHome', attributes: ['teamName'] },
+        { model: Teams, as: 'teamAway', attributes: ['teamName'] },
+      ],
+    });
 
-      return allMatches;
-    } catch (error) {
-      return error;
-    }
+    return allMatches;
   };
 
   public getAllInProgressMatches = async (value: boolean) => {
-    try {
-      const allInProgressMatches = await this.match.findAll({
-        where: { inProgress: value },
-        include: [
-          { model: Teams, as: 'teamHome', attributes: ['teamName'] },
-          { model: Teams, as: 'teamAway', attributes: ['teamName'] },
-        ],
-      });
+    const allInProgressMatches = await this.match.findAll({
+      where: { inProgress: value },
+      include: [
+        { model: Teams, as: 'teamHome', attributes: ['teamName'] },
+        { model: Teams, as: 'teamAway', attributes: ['teamName'] },
+      ],
+    });
 
-      return allInProgressMatches;
-    } catch (error) {
-      return error;
-    }
+    return allInProgressMatches;
   };
 
-  public createMatch = async (match: number[]) => {
-    try {
-      const createdMatch = await this.match.create(match);
+  public createMatch = async (match: Record<string, unknown>) => {
+    const createdMatch = await this.match.create(match);
 
-      return createdMatch;
-    } catch (error) {
-      return error;
-    }
+    return createdMatch;
   };
 
   public getMatchById = async (id: number) => {
-    try {
-      const match = await this.match.findOne({
-        where: {
-          id,
-        },
-      });
+    const match = await this.match.findOne({
+      where: {
+        id,
+      },
+    });
 
-      return match;
-    } catch (error) {
-      return error;
-    }
+    return match;
   };
 
   public finishMatch = async (id: number) => {
-    try {
-      const result = await this.match.update({
-        inProgress: false,
-      }, {
-        where: {
-          id,
-        },
-      });
+    const result = await this.match.update({
+      inProgress: false,
+    }, {
+      where: {
+        id,
+      },
+    });
 
-      return result;
-    } catch (error) {
-      return error;
-    }
+    return result;
   };
 
   public updateMatch = async (
     id: number,
     { homeTeamGoals, awayTeamGoals }: any,
   ) => {
-    try {
-      const result = await this.match.update({
-        homeTeamGoals,
-        awayTeamGoals,
-      }, {
-        where: {
-          id,
-        },
-      });
+    const result = await this.match.update({
+      homeTeamGoals,
+      awayTeamGoals,
+    }, {
+      where: {
+        id,
+      },
+    });
 
-      return result;
-    } catch (error) {
-      return error;
-    }
+    return result;
   };
 
   public getHomeLeaderboard = async () => {
-    try {
-      const teams = await this.getAllTeams();
-      const matches = await this.getAllMatches();
-      const leaderboard = new Leaderboard(teams, matches);
-      const board = await leaderboard.createLeaderboard();
-      return leaderboard.sortLeaderboard(board);
-    } catch (error) {
-      return error;
-    }
+    const teams = await this.getAllTeams();
+    const matches = await this.getAllMatches();
+    const leaderboard = new Leaderboard(teams, matches);
+    const board = await leaderboard.createLeaderboard();
+    return leaderboard.sortLeaderboard(board);
   };
 
   public getAwayLeaderboard = async () => {
-    try {
-      const teams = await this.getAllTeams();
-      const matches = await this.getAllMatches();
-      const leaderboard = new Leaderboard(teams, matches);
-      const board = await leaderboard.createAwayLeaderboard();
-      return leaderboard.sortLeaderboard(board);
-    } catch (error) {
-      return error;
-    }
+    const teams = await this.getAllTeams();
+    const matches = await this.getAllMatches();
+    const leaderboard = new Leaderboard(teams, matches);
+    const board = await leaderboard.createAwayLeaderboard();
+    return leaderboard.sortLeaderboard(board);
   };
 
   public joinBoards = async (board: any) => {
-    try {
-      const teams = await this.getAllTeams();
-      const matches = await this.getAllMatches();
-      const leaderboard = new Leaderboard(teams, matches);
-      const mergedBoard = await leaderboard.joinBoards(board);
-      return leaderboard.sortLeaderboard(mergedBoard);
-    } catch (error) {
-      return error;
-    }
+    const teams = await this.getAllTeams();
+    const matches = await this.getAllMatches();
+    const leaderboard = new Leaderboard(teams, matches);
+    const mergedBoard = await leaderboard.joinBoards(board);
+    return leaderboard.sortLeaderboard(mergedBoard);
   };
 }

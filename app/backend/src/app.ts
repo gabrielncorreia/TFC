@@ -14,19 +14,23 @@ class App {
   }
 
   private config():void {
-    const accessControl: express.RequestHandler = (_req, res, next) => {
-      res.header('Access-Control-Allow-Origin', '*');
-      res.header('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS,PUT,PATCH');
-      res.header('Access-Control-Allow-Headers', '*');
-      next();
-    };
+    // Comma-separated list of front-end origins allowed to call the API.
+    const origin = (process.env.CORS_ORIGINS || 'http://localhost:3000').split(',');
 
-    this.app.use(cors());
-    this.app.use(accessControl);
+    this.app.use(cors({ origin }));
     this.app.use(express.json()); // Necessário para fazer o parse do body.
     this.app.use(Routes);
-    // ...
+    this.app.use(App.errorHandler);
   }
+
+  // Client errors (such as malformed JSON) keep their status; anything else is logged and hidden.
+  private static errorHandler: express.ErrorRequestHandler = (err, _req, res, _next) => {
+    if (err.status >= 400 && err.status < 500) {
+      return res.status(err.status).json({ message: err.message });
+    }
+    console.error(err);
+    return res.status(500).json({ message: 'Internal server error' });
+  };
 
   // ...
   public start(PORT: string | number):void {

@@ -1,6 +1,13 @@
 import 'dotenv/config';
 import { Options } from 'sequelize';
 
+// The fallbacks below are the local Docker defaults; production must never use them.
+if (process.env.NODE_ENV === 'production') {
+  const missing = ['DB_USER', 'DB_PASS', 'DB_NAME', 'DB_HOST', 'DB_PORT']
+    .filter((name) => !process.env[name] || (name === 'DB_PORT' && !Number(process.env[name])));
+  if (missing.length) throw new Error(`Missing or invalid database settings: ${missing.join(', ')}`);
+}
+
 const config: Options = {
   username: process.env.DB_USER || 'root',
   password: process.env.DB_PASS || '123456',

@@ -39,13 +39,14 @@ Built individually at [Trybe](https://www.betrybe.com/), which provided the fron
 
 ## Running locally
 
-Requires Docker with Docker Compose. From the `app` folder:
+Requires Docker with Docker Compose. The API signs its login tokens with a secret it reads from the `JWT_SECRET` environment variable and will not start without it. From the `app` folder, create an `app/.env` file holding a random value, then start the containers:
 
 ```sh
+echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
 docker-compose up -d --build
 ```
 
-The front end runs at http://localhost:3000 and the API at http://localhost:3001. To run the tests, from `app/backend`:
+The front end runs at http://localhost:3000 and the API at http://localhost:3001. The seeded local logins are `admin@admin.com` / `secret_admin` and `user@user.com` / `secret_user`; in production the seeder takes the passwords from `ADMIN_PASSWORD` and `USER_PASSWORD` instead. To run the tests, from `app/backend`:
 
 ```sh
 npm install

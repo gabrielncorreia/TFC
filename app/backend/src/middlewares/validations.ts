@@ -8,7 +8,7 @@ const service = new Service();
 export default class Validations {
   public login = (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
-    if (!email || !password) {
+    if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
       return res.status(400).json({ message: 'All fields must be filled' });
     }
 
