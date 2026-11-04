@@ -4,16 +4,14 @@
   "description": "",
   "main": "./build/server",
   "scripts": {
-    "build": "/bin/sh tsc_eval.sh",
-    "test": "mocha -r ts-node/register -r ./src/tests/setup.ts ./src/tests/*$NAME*.{test,spec}.ts -t 10000 --exit",
+    "build": "tsc",
+    "test": "mocha",
     "test:coverage": "nyc npm run test",
     "test:coverage:json": "nyc --reporter=json-summary npm run test",
     "db:reset": "npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all",
     "start": "node .",
     "predev": "npm run build && npm run db:reset",
-
     "dev": "nodemon --watch \"./src/**\" --ext \"ts,js\" --ignore \"src/**/*.spec.ts,src/**/*.json\" --exec \"ts-node src/server.ts\"",
-    "postinstall": "if [ ! -z 'cat ./packages.npm' ]; then npm i --ignore-scripts $(cat ./packages.npm); fi",
     "lint": "eslint ./src --ext .ts"
   },
   "keywords": [],
@@ -58,5 +56,8 @@
     "jsonwebtoken": "9.0.3",
     "mysql2": "3.24.6",
     "sequelize": "6.37.8"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }

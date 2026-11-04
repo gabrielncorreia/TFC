@@ -17,6 +17,8 @@ const config: Options = {
   dialect: 'mysql',
   dialectOptions: {
     timezone: 'Z',
+    // TiDB Cloud requires TLS; Node's built-in CA store already trusts its certificate.
+    ...(process.env.DB_SSL === 'true' && { ssl: { minVersion: 'TLSv1.2', rejectUnauthorized: true } }),
   },
   logging: false,
 }

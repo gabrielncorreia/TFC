@@ -123,4 +123,21 @@ describe('Testando a configuração do banco', () => {
 
     expect(require('../database/config/database')).to.include({ username: 'u', password: 'p', port: 4000 });
   });
+
+  it('Com DB_SSL=true, conecta com TLS 1.2 verificado', () => {
+    process.env.DB_SSL = 'true';
+    delete require.cache[configPath];
+
+    expect(require('../database/config/database').dialectOptions).to.deep.equal({
+      timezone: 'Z',
+      ssl: { minVersion: 'TLSv1.2', rejectUnauthorized: true },
+    });
+  });
+
+  it('Sem DB_SSL, não usa TLS', () => {
+    delete process.env.DB_SSL;
+    delete require.cache[configPath];
+
+    expect(require('../database/config/database').dialectOptions).to.deep.equal({ timezone: 'Z' });
+  });
 });

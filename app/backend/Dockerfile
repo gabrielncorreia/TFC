@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:24-alpine
 # Criando um diretorio de trabalho:
 WORKDIR /app
 # Copiando determinados arquivos para o workdir, para a pasta /app, o diretório atual:
