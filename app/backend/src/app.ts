@@ -19,8 +19,9 @@ class App {
     const origin = (process.env.CORS_ORIGINS || 'http://localhost:3000').split(',');
 
     this.app.use(cors({ origin }));
-    // Vercel sits in front of the app; trust its one proxy hop for the client IP.
-    this.app.set('trust proxy', 1);
+    // On Vercel (which sets VERCEL=1) its proxy overwrites X-Forwarded-For, so trust that one hop for the
+    // client IP. Elsewhere, such as the Docker image, a client could forge the header to dodge the login limit.
+    if (process.env.VERCEL) this.app.set('trust proxy', 1);
     // shortcut: counts per function instance (in memory), so it slows login floods rather than stopping them; use a shared store if that matters.
     this.app.post('/login', rateLimit({
       windowMs: 15 * 60 * 1000,

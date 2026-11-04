@@ -113,6 +113,19 @@ describe('Testando o limite de tentativas de login', () => {
     expect(blocked.status).to.be.equal(429);
     expect(blocked.body).to.deep.equal({ message: 'Too many login attempts, try again later' });
   });
+
+  it('Fora da Vercel, um X-Forwarded-For forjado não escapa do limite', async () => {
+    process.env.LOGIN_RATE_LIMIT = '1';
+    delete process.env.VERCEL;
+    const limited = new App().app;
+    sinon.stub(User, 'findOne').resolves(null);
+    const attempt = (ip: string) => chai.request(limited).post('/login')
+      .set('X-Forwarded-For', ip)
+      .send({ email: 'ninguem@admin.com', password: 'chute' });
+
+    expect((await attempt('203.0.113.1')).status).to.be.equal(401);
+    expect((await attempt('203.0.113.2')).status).to.be.equal(429);
+  });
 });
 
 describe('Testando a configuração do banco', () => {
