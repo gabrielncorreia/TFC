@@ -46,10 +46,11 @@ const MatchSettings = () => {
 
   useEffect(() => {
     if (isAuthenticated && !match) {
-      requestData('/teams').then(setTeams).catch(() => setMessage({
-        key: 'editor.teamsError',
-        error: true,
-      }));
+      const failed = () => setMessage({ key: 'editor.teamsError', error: true });
+      // A wrong API address returns the app's own HTML page, so check for a list.
+      requestData('/teams')
+        .then((data) => (Array.isArray(data) ? setTeams(data) : failed()))
+        .catch(failed);
     }
   }, [isAuthenticated, match]);
 
