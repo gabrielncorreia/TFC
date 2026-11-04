@@ -27,4 +27,7 @@ router.get('/leaderboard/away', safe(controller.getAwayLeaderboard));
 
 router.get('/leaderboard', safe(controller.getLeaderboard));
 
+// Called nightly by the Vercel cron in vercel.json to restore the demo data.
+router.get('/demo/reset', validate.cronSecret, safe(controller.resetDemo));
+
 export default router;

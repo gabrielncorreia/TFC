@@ -44,3 +44,6 @@ export { App };
 
 // A execução dos testes de cobertura depende dessa exportação
 export const { app } = new App();
+
+// Vercel looks for a default export in src/app.ts and runs it as a function; server.ts keeps listen() for local use.
+export default app;

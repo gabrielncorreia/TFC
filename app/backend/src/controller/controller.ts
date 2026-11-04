@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import * as bcrypt from 'bcryptjs';
 import JWT from '../middlewares/jwt';
 import Service from '../service/service';
+import resetDemo from '../service/demoReset';
 
 const jwt = new JWT();
 // Same cost as the passwords the production seeder stores.
@@ -131,5 +132,11 @@ export default class Controller {
     const leaderboard = await this.service.joinBoards(homePlusAway);
 
     res.status(200).json(leaderboard);
+  };
+
+  public resetDemo = async (_req: Request, res: Response) => {
+    const counts = await resetDemo();
+
+    res.status(200).json(counts);
   };
 }

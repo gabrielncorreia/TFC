@@ -1,11 +1,26 @@
 import { NextFunction, Request, Response } from 'express';
+import { createHash, timingSafeEqual } from 'crypto';
 import Service from '../service/service';
 import JWT from './jwt/index';
 
 const jwt = new JWT();
 const service = new Service();
 
+const sha256 = (value: string) => createHash('sha256').update(value).digest();
+
 export default class Validations {
+  // Vercel cron sends `Authorization: Bearer <CRON_SECRET>`; without the variable the route stays closed.
+  public cronSecret = (req: Request, res: Response, next: NextFunction) => {
+    const secret = process.env.CRON_SECRET;
+    const given = req.headers.authorization || '';
+
+    if (!secret || !timingSafeEqual(sha256(given), sha256(`Bearer ${secret}`))) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    next();
+  };
+
   public login = (req: Request, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
     if (!email || !password || typeof email !== 'string' || typeof password !== 'string') {
