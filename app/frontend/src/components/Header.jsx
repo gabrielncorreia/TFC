@@ -20,25 +20,31 @@ const Header = ({
   };
 
   return (
-    <header className="common-header">
-      <div className="image-content">
-        <img src={ negativeLogo } alt="Trybe Futebol Clube Negative Logo" />
-      </div>
-      <h1 data-testid="header__title">{ page }</h1>
-      <div className="buttons-content">
-        <FirstNavigationLink />
-        {
-          (logged)
-            ? (
-              <button type="button" onClick={ () => logoff() }>
-                Sair
-                <img src={ exitToAppImg } alt="Sair do aplicativo" />
-              </button>
-            )
-            : <SecondNavegationLink />
-        }
-      </div>
-    </header>
+    <>
+      <p className="demo-notice" role="note">
+        Demonstração: partidas criadas ou editadas são apagadas todas as noites,
+        por volta da meia-noite (horário de Brasília).
+      </p>
+      <header className="common-header">
+        <div className="image-content">
+          <img src={ negativeLogo } alt="Trybe Futebol Clube Negative Logo" />
+        </div>
+        <h1 data-testid="header__title">{ page }</h1>
+        <div className="buttons-content">
+          <FirstNavigationLink />
+          {
+            (logged)
+              ? (
+                <button type="button" onClick={ () => logoff() }>
+                  Sair
+                  <img src={ exitToAppImg } alt="Sair do aplicativo" />
+                </button>
+              )
+              : <SecondNavegationLink />
+          }
+        </div>
+      </header>
+    </>
   );
 };
 

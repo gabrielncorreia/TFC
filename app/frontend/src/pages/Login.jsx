@@ -7,6 +7,10 @@ import { requestLogin } from '../services/requests';
 import { positiveLogo } from '../images';
 import '../styles/pages/login.css';
 
+// Public demo account, set at build time on Vercel only; local builds show nothing.
+const DEMO_EMAIL = process.env.REACT_APP_DEMO_EMAIL;
+const DEMO_PASSWORD = process.env.REACT_APP_DEMO_PASSWORD;
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -65,6 +69,15 @@ const Login = () => {
               placeholder="Senha"
             />
           </label>
+          {
+            (DEMO_EMAIL && DEMO_PASSWORD)
+              ? (
+                <p className="demo-credentials">
+                  { `Login de demonstração: ${DEMO_EMAIL} / ${DEMO_PASSWORD}` }
+                </p>
+              )
+              : null
+          }
           {
             (failedTryLogin)
               ? (

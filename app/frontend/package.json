@@ -15,8 +15,8 @@
     "web-vitals": "1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "react-scripts --openssl-legacy-provider start",
+    "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -43,5 +43,8 @@
     "jest": "26.6.0",
     "stylelint": "13.8.0",
     "stylelint-order": "4.1.0"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }

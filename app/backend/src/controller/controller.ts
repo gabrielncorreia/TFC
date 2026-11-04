@@ -1,21 +1,27 @@
 import { Request, Response } from 'express';
+import * as bcrypt from 'bcryptjs';
 import JWT from '../middlewares/jwt';
 import Service from '../service/service';
+import resetDemo from '../service/demoReset';
 
 const jwt = new JWT();
+// Same cost as the passwords the production seeder stores.
+const DUMMY_HASH = bcrypt.hashSync('no user has this password', 10);
 
 export default class Controller {
   constructor(private service = new Service()) {}
 
   public loginUser = async (req: Request, res: Response) => {
-    const { email } = req.body;
-    const result = await this.service.getUserByUsernameAndPassword(email) as any;
+    const { email, password } = req.body;
+    const result = await this.service.getUserByEmail(email) as any;
 
-    if (!result) {
+    // Unknown emails are compared too, so response time does not reveal which emails exist.
+    const passwordMatches = await bcrypt.compare(password, result?.password ?? DUMMY_HASH);
+    if (!result || !passwordMatches) {
       return res.status(401).json({ message: 'Incorrect email or password' });
     }
 
-    const generatedToken = jwt.generateToken(req.body);
+    const generatedToken = jwt.generateToken({ email: result.email, role: result.role });
     res.status(200).json({
       user: {
         id: result.id,
@@ -37,7 +43,7 @@ export default class Controller {
       return res.status(400).json({ message: tokenValidation.message });
     }
     const { data: { email } } = tokenValidation as any;
-    const result = await this.service.getUserByUsernameAndPassword(email) as any;
+    const result = await this.service.getUserByEmail(email) as any;
 
     res.status(200).json(result.role);
   };
@@ -126,5 +132,11 @@ export default class Controller {
     const leaderboard = await this.service.joinBoards(homePlusAway);
 
     res.status(200).json(leaderboard);
+  };
+
+  public resetDemo = async (_req: Request, res: Response) => {
+    const counts = await resetDemo();
+
+    res.status(200).json(counts);
   };
 }

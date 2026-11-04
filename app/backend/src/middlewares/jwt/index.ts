@@ -1,10 +1,11 @@
+import 'dotenv/config';
 import * as jwt from 'jsonwebtoken';
-import { readFileSync } from 'fs';
 
-const Secret = readFileSync('jwt.evaluation.key', 'utf-8');
+const Secret = process.env.JWT_SECRET;
+if (!Secret) throw new Error('JWT_SECRET must be set');
 
 export default class JWT {
-  constructor(private secret = Secret) {}
+  constructor(private secret: string = Secret as string) {}
 
   public generateToken = (credentials: any) => {
     const token = jwt.sign({ data: credentials }, this.secret, {
@@ -17,7 +18,7 @@ export default class JWT {
 
   public validateToken = (token: string) => {
     try {
-      const decoded = jwt.verify(token, this.secret);
+      const decoded = jwt.verify(token, this.secret, { algorithms: ['HS256'] });
       return decoded;
     } catch (error) {
       return error;

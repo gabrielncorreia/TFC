@@ -90,6 +90,7 @@ export default class Leaderboard {
   };
 
   private calculateEfficiency = (totalPoints: number, matchesLength: number) => {
+    if (!matchesLength) return 0;
     const result = (totalPoints / (matchesLength * 3)) * 100;
 
     if (result >= 100) {
@@ -183,6 +184,7 @@ export default class Leaderboard {
     if (property === 'efficiency') {
       const totalPoints = matches.reduce((prev: any, curr: any) => prev + curr.totalPoints, 0);
       const totalGames = matches.reduce((prev: any, curr: any) => prev + curr.totalGames, 0);
+      if (!totalGames) return 0;
       const efficiency = (totalPoints / (totalGames * 3)) * 100;
 
       if (Number.isInteger(efficiency)) return efficiency;

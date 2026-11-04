@@ -28,6 +28,7 @@ services:
       db:
         condition: service_healthy
     environment:
+      - NODE_ENV=development
       - PORT=3001
       # Os dados abaixo se referem ao container `db`
       # Dica: Relembre aqui da comunicação interna entre containers
@@ -36,6 +37,7 @@ services:
       - DB_HOST=db
       - DB_NAME=TRYBE_FUTEBOL_CLUBE
       - DB_PORT=3306
+      - JWT_SECRET=${JWT_SECRET:?Set JWT_SECRET in app/.env or your shell}
     healthcheck:
       test: ["CMD", "lsof", "-t", "-i:3001"] # Caso utilize outra porta interna para o back, altere ela aqui também
       timeout: 10s

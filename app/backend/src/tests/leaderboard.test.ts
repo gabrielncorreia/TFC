@@ -55,4 +55,22 @@ describe('Testando a rota /leaderboard', () => {
     expect(chaiHttpResponse.body).to.have.same.deep.members(leaderboardAwayMockResponse);
 
   });
+
+  it('GET /leaderboard soma casa e visitante de cada time e ordena por pontos', async () => {
+    chaiHttpResponse = await chai.request(app).get('/leaderboard');
+    const board = chaiHttpResponse.body as any[];
+
+    expect(chaiHttpResponse.status).to.be.equal(200);
+    expect(board.length).to.be.equal(allTeamsMock.length);
+    board.forEach((row) => {
+      const home = leaderboardHomeMockResponse.find(({ name }) => name === row.name) as any;
+      const away = leaderboardAwayMockResponse.find(({ name }) => name === row.name) as any;
+      ['totalPoints', 'totalGames', 'totalVictories', 'goalsFavor', 'goalsOwn'].forEach((key) => {
+        expect(row[key], `${row.name} ${key}`).to.be.equal(home[key] + away[key]);
+      });
+    });
+    board.slice(1).forEach((row, i) => {
+      expect(row.totalPoints).to.be.at.most(board[i].totalPoints);
+    });
+  });
 });

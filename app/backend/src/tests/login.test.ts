@@ -3,7 +3,6 @@ import * as chai from 'chai';
 import chaiHttp = require('chai-http');
 
 import { app } from '../app';
-import Example from '../database/models/ExampleModel';
 import User from '../database/models/User'
 import { findOneMock } from './mocks/login-mocks';
 
@@ -122,5 +121,63 @@ describe('Testando a rota /login', () => {
     expect(message).to.be.a.string
     expect(message).to.be.equal('You must provide a JWT Token');
     expect(chaiHttpResponse.status).to.be.equal(400);
+  })
+
+  it('POST /login com a senha errada retorna 401 e nenhum token', async () => {
+    chaiHttpResponse = await chai.request(app).post('/login')
+    .send({
+      email: 'admin@admin.com',
+      password: 'secret_admin'
+    });
+
+    expect(chaiHttpResponse.status).to.be.equal(401);
+    expect(chaiHttpResponse.body.token).to.not.exist;
+    expect(chaiHttpResponse.body.message).to.be.equal('Incorrect email or password');
+  })
+
+  it('POST /login com um email desconhecido retorna 401', async () => {
+    (User.findOne as sinon.SinonStub).resolves(null);
+    chaiHttpResponse = await chai.request(app).post('/login')
+    .send({
+      email: 'ninguem@admin.com',
+      password: 'senha_super_segura'
+    });
+    (User.findOne as sinon.SinonStub).resolves(findOneMock as User);
+
+    expect(chaiHttpResponse.status).to.be.equal(401);
+  })
+
+  it('POST /login com uma senha que não é texto retorna 400', async () => {
+    chaiHttpResponse = await chai.request(app).post('/login')
+    .send({
+      email: 'admin@admin.com',
+      password: { length: 1 }
+    });
+
+    expect(chaiHttpResponse.status).to.be.equal(400);
+  })
+
+  it('O token do login não contém a senha', async () => {
+    chaiHttpResponse = await chai.request(app).post('/login')
+    .send({
+      email: 'admin@admin.com',
+      password: 'senha_super_segura'
+    });
+    const [, payload] = chaiHttpResponse.body.token.split('.');
+    const { data } = JSON.parse(Buffer.from(payload, 'base64').toString());
+
+    expect(data).to.deep.equal({ email: 'admin@admin.com', role: 'admin' });
+  })
+
+  it('GET /login/validate com um token assinado por outro segredo retorna um erro', async () => {
+    const [header, , signature] = (await chai.request(app).post('/login')
+      .send({ email: 'admin@admin.com', password: 'senha_super_segura' })).body.token.split('.');
+    const payload = Buffer.from(JSON.stringify({ data: { email: 'user@user.com', role: 'admin' } })).toString('base64url');
+
+    chaiHttpResponse = await chai.request(app).get('/login/validate')
+      .set('authorization', `${header}.${payload}.${signature}`);
+
+    expect(chaiHttpResponse.status).to.be.equal(400);
+    expect(chaiHttpResponse.body.message).to.be.equal('invalid signature');
   })
 });
