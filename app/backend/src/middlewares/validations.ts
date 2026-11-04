@@ -41,6 +41,16 @@ export default class Validations {
 
     if (m) return res.status(400).json({ message: m });
 
+    res.locals.user = (tokenValidation as any).data;
+    next();
+  };
+
+  // Runs after `token`; the role comes from the signed token, so a client cannot change it.
+  public admin = (_req: Request, res: Response, next: NextFunction) => {
+    if (res.locals.user?.role !== 'admin') {
+      return res.status(403).json({ message: 'Only admins can change matches' });
+    }
+
     next();
   };
 

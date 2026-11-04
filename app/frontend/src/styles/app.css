@@ -1,9 +1,239 @@
-* {
+/* Tokens. Colors come from the club shield: pine and grass stripes. */
+:root {
+  --pine-900: #0e3533;
+  --pine-700: #1d4f4b;
+  --grass-600: #17805a;
+  --grass-700: #116645;
+  --grass-100: #e2f2e9;
+  --paper: #f3f6f4;
+  --surface: #fcfdfc;
+  --on-dark: #f7faf8;
+  --ink: #16211f;
+  --ink-muted: #51605c;
+  --rule: #dce4e0;
+  --rule-strong: #c3d0ca;
+  --live: #c2410c;
+  --danger: #b3361f;
+  --danger-100: #fbe9e5;
+
+  --font: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.2rem;
+  --text-xl: 1.44rem;
+  --text-2xl: 2rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  --radius-control: 6px;
+  --radius-panel: 10px;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* z-index scale: only the sticky table header uses a layer. */
+  --z-sticky: 10;
+}
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-#root {
-  min-width: max-content;
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2 {
+  font-stretch: 85%;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--text-2xl);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+}
+
+button,
+input,
+select {
+  color: inherit;
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--grass-600);
+  outline-offset: 2px;
+}
+
+.page {
+  margin: 0 auto;
+  max-width: 64rem;
+  padding: var(--space-8) var(--space-4) var(--space-12);
+}
+
+.page-heading {
+  align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  justify-content: space-between;
+  margin-bottom: var(--space-6);
+}
+
+.page-lede {
+  color: var(--ink-muted);
+  margin-top: var(--space-2);
+  max-width: 60ch;
+}
+
+/* Buttons: one primary, one secondary, used the same way on every screen. */
+.button {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 650;
+  gap: var(--space-2);
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--space-4);
+  text-decoration: none;
+  transition: background-color 150ms var(--ease-out), transform 150ms var(--ease-out);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.button-primary {
+  background: var(--grass-600);
+  color: var(--on-dark);
+}
+
+.button-primary:hover:not(:disabled) {
+  background: var(--grass-700);
+}
+
+.button-secondary {
+  background: var(--surface);
+  border-color: var(--rule-strong);
+  color: var(--ink);
+}
+
+.button-secondary:hover:not(:disabled) {
+  background: var(--grass-100);
+  border-color: var(--grass-600);
+}
+
+/* Segmented control built on radio inputs, so arrow keys work natively. */
+.segmented {
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-control);
+  display: inline-flex;
+  padding: 3px;
+}
+
+.segmented input {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.segmented label {
+  border-radius: 4px;
+  color: var(--ink-muted);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  padding: var(--space-2) var(--space-3);
+  transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out);
+  white-space: nowrap;
+}
+
+.segmented label:hover {
+  color: var(--ink);
+}
+
+.segmented input:checked + label {
+  background: var(--pine-900);
+  color: var(--on-dark);
+}
+
+.segmented input:focus-visible + label {
+  outline: 3px solid var(--grass-600);
+  outline-offset: 2px;
+}
+
+/* Loading, error and empty states. */
+.skeleton {
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+  background: var(--rule);
+  border-radius: 4px;
+  display: block;
+  height: 1rem;
+}
+
+@keyframes skeleton-pulse {
+  50% { opacity: 0.45; }
+}
+
+.request-state {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-panel);
+  padding: var(--space-8) var(--space-6);
+}
+
+.request-state p {
+  max-width: 60ch;
+}
+
+.request-state p + .button {
+  margin-top: var(--space-4);
+}
+
+.request-state-error {
+  background: var(--danger-100);
+  border-color: #f0c4b9;
+}
+
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

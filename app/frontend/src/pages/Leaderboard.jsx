@@ -1,42 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header';
 import LeaderboardTable from '../components/LeaderboardTable';
-import LoginBtn from '../components/LoginBtn';
-import MatchesBtn from '../components/MatchesBtn';
-import TableFilter from '../components/TableFilter';
-import '../styles/pages/leaderboard.css';
+import SegmentedControl from '../components/SegmentedControl';
+import { useTranslation } from '../i18n';
+
+const FILTERS = [
+  { value: '/leaderboard', labelKey: 'leaderboard.filterAll' },
+  { value: '/leaderboard/home', labelKey: 'leaderboard.filterHome' },
+  { value: '/leaderboard/away', labelKey: 'leaderboard.filterAway' },
+];
 
 const Leaderboard = () => {
-  const [logged, setLogin] = useState(false);
-  const [currentFilter, setCurrentFilter] = useState('Classificação Geral');
-
-  useEffect(() => {
-    const user = localStorage.getItem('user');
-
-    if (!user) return setLogin(false);
-
-    if (JSON.parse(user).token) return setLogin(true);
-  }, [logged, setLogin]);
+  const { t } = useTranslation();
+  const [logged, setLogin] = useState(() => {
+    const user = JSON.parse(localStorage.getItem('user')) || {};
+    return Boolean(user.token);
+  });
+  const [endpoint, setEndpoint] = useState(FILTERS[0].value);
 
   return (
     <>
-      <Header
-        page="CLASSIFICAÇÃO"
-        FirstNavigationLink={ MatchesBtn }
-        SecondNavegationLink={ LoginBtn }
-        logged={ logged }
-        setLogin={ setLogin }
-      />
-      <div className="classification-handlers score-board-table-section">
-        <TableFilter
-          currentFilter={ currentFilter }
-          setCurrentFilter={ setCurrentFilter }
-        />
-      </div>
-      <LeaderboardTable
-        currentFilter={ currentFilter }
-        setCurrentFilter={ setCurrentFilter }
-      />
+      <Header logged={ logged } setLogin={ setLogin } />
+      <main className="page">
+        <div className="page-heading">
+          <div>
+            <h1 data-testid="header__title">{ t('leaderboard.title') }</h1>
+            <p className="page-lede">{ t('leaderboard.lede') }</p>
+          </div>
+          <SegmentedControl
+            name="classification-filter"
+            legend={ t('leaderboard.filterLegend') }
+            options={ FILTERS.map(({ value, labelKey }) => ({ value, label: t(labelKey) })) }
+            value={ endpoint }
+            onChange={ setEndpoint }
+            testId="score_boarding__classification_filter"
+          />
+        </div>
+        <LeaderboardTable endpoint={ endpoint } />
+      </main>
     </>
   );
 };

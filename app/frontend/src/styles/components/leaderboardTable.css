@@ -1,103 +1,153 @@
-.score-board-table-section {
-  display: flex;
+.standings {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-panel);
+  overflow-x: auto;
+  transition: opacity 150ms var(--ease-out);
+}
+
+.standings[aria-busy='true'] {
+  opacity: 0.6;
+}
+
+.standings-table {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  min-width: 34rem;
+  width: 100%;
+}
+
+.standings-table th,
+.standings-table td {
+  padding: var(--space-3) var(--space-2);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.standings-table thead th {
+  background: var(--surface);
+  border-bottom: 1px solid var(--rule-strong);
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.standings-table abbr {
+  text-decoration: none;
+}
+
+.standings-table tbody tr + tr {
+  border-top: 1px solid var(--rule);
+}
+
+.standings-table tbody tr:hover {
+  background: var(--paper);
+}
+
+.standings-table th:first-child,
+.standings-table td:first-child {
+  padding-left: var(--space-4);
+  width: 3.5rem;
+}
+
+.standings-table .standings-team {
+  font-weight: 600;
+  text-align: left;
+  width: 100%;
+}
+
+.standings-table thead .standings-team {
+  font-weight: 600;
+}
+
+.standings-points {
+  font-weight: 750;
+}
+
+.standings-table td:last-child,
+.standings-table th:last-child {
+  padding-right: var(--space-4);
+}
+
+/* Position chip: neutral by default, colored for the top and bottom four. */
+.position {
+  align-items: center;
+  border-radius: 4px;
+  display: inline-flex;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  height: 1.75rem;
   justify-content: center;
-  min-width: max-content;
-  padding: 20px 50px;
+  min-width: 1.75rem;
+  padding: 0 var(--space-1);
 }
 
-.score-board-table-section table {
-  height: min-content;
+.zone-top {
+  background: var(--grass-600);
+  color: var(--on-dark);
 }
 
-.score-board-table thead th {
-  padding: 15px 0;
+.zone-bottom {
+  background: var(--danger);
+  color: var(--on-dark);
 }
 
-.score-board-table thead tr th {
-  color: black;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 19px;
-  text-align: center;
+.standings-legend {
+  color: var(--ink-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: var(--text-sm);
+  gap: var(--space-2) var(--space-6);
+  list-style: none;
+  margin-top: var(--space-4);
 }
 
-.score-board-classification {
-  background: #023031;
-  border-radius: 8px;
-  color: white;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 18px;
-  font-style: normal;
-  font-weight: 700;
-  height: 43px;
-  line-height: 22px;
-  min-width: 137px;
-  text-align: center;
+.standings-legend li {
+  align-items: center;
+  display: flex;
+  gap: var(--space-2);
 }
 
-.score-board-team-name {
-  background: #036b52;
-  border-radius: 8px;
-  color: white;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 18px;
-  font-style: normal;
-  height: 43px;
-  line-height: 22px;
-  min-width: 183px;
-  text-align: center;
+.legend-swatch {
+  border-radius: 3px;
+  display: inline-block;
+  height: 0.875rem;
+  width: 0.875rem;
 }
 
-.score-board-total-points, .score-board-total-victories {
-  background: #f0f2f5;
-  border-radius: 8px;
-  color: black;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 18px;
-  font-style: normal;
-  height: 43px;
-  line-height: 22px;
-  min-width: 87px;
-  text-align: center;
+.standings-skeleton-row {
+  align-items: center;
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-4);
 }
 
-.score-board-total-looses, .score-board-goals-own, .score-board-efficiency {
-  background: #f0f2f5;
-  border-radius: 8px;
-  color: black;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 18px;
-  font-style: normal;
-  height: 43px;
-  line-height: 22px;
-  min-width: 87px;
-  text-align: center;
+.standings-skeleton-row + .standings-skeleton-row {
+  border-top: 1px solid var(--rule);
 }
 
-.score-board-total-games, .score-board-total-draws {
-  background: #e1e5eb;
-  border-radius: 8px;
-  color: black;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 18px;
-  font-style: normal;
-  height: 43px;
-  line-height: 22px;
-  min-width: 87px;
-  text-align: center;
+/* Goals for and against are the first columns to go on small screens; the balance stays. */
+@media (max-width: 40rem) {
+  .standings-wide {
+    display: none;
+  }
+
+  .standings-table {
+    min-width: 0;
+  }
+
+  .standings-table th,
+  .standings-table td {
+    padding: var(--space-3) 0.3rem;
+  }
 }
 
-.score-board-goals-favor, .score-board-goals-balance {
-  background: #e1e5eb;
-  border-radius: 8px;
-  color: black;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 18px;
-  font-style: normal;
-  height: 43px;
-  line-height: 22px;
-  min-width: 87px;
-  text-align: center;
+/* Narrow phones also drop the percentage; goal difference carries the same story. */
+@media (max-width: 26rem) {
+  .standings-optional {
+    display: none;
+  }
 }

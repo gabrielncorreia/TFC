@@ -1,104 +1,123 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import Header from '../components/Header';
-import LeaderboardBtn from '../components/LeaderboardBtn';
-import MatchesBtn from '../components/MatchesBtn';
 import { requestLogin } from '../services/requests';
 import { positiveLogo } from '../images';
+import { useTranslation } from '../i18n';
 import '../styles/pages/login.css';
 
 // Public demo account, set at build time on Vercel only; local builds show nothing.
 const DEMO_EMAIL = process.env.REACT_APP_DEMO_EMAIL;
 const DEMO_PASSWORD = process.env.REACT_APP_DEMO_PASSWORD;
 
+const errorKey = (error) => {
+  const status = error.response && error.response.status;
+  if (status === 401 || status === 400) return 'login.wrongCredentials';
+  if (status === 429) return 'login.tooManyAttempts';
+  return 'login.unreachable';
+};
+
 const Login = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLogged, setIsLogged] = useState(false);
-  const [failedTryLogin, setFailedTryLogin] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   const login = async (event) => {
     event.preventDefault();
+    setSubmitting(true);
+    setError('');
 
     try {
-      const endpoint = '/login';
-
-      const { token, user } = await requestLogin(endpoint, { email, password });
-
+      const { token, user } = await requestLogin('/login', { email, password });
       localStorage.setItem('user', JSON.stringify({ token, ...user }));
       setIsLogged(true);
-    } catch (error) {
-      setFailedTryLogin(true);
-      setIsLogged(false);
+    } catch (requestError) {
+      setError(errorKey(requestError));
+      setSubmitting(false);
     }
   };
-
-  useEffect(() => {
-    setFailedTryLogin(false);
-  }, [email, password]);
 
   if (isLogged) return <Navigate to="/matches" />;
 
   return (
     <>
-      <Header
-        page="LOGIN"
-        FirstNavigationLink={ LeaderboardBtn }
-        SecondNavegationLink={ MatchesBtn }
-      />
-      <section className="user-login-area">
-        <img src={ positiveLogo } alt="Trybe Futebol Clube Negative Logo" />
-        <form>
-          <h1>Área do usuário</h1>
-          <label htmlFor="email-input">
+      <Header />
+      <main className="page login-page">
+        <section className="login-panel" aria-labelledby="login-title">
+          <img className="login-logo" src={ positiveLogo } alt="" />
+          <h1 id="login-title" data-testid="header__title">{ t('login.title') }</h1>
+          <p className="page-lede">{ t('login.lede') }</p>
+
+          {
+            (DEMO_EMAIL && DEMO_PASSWORD) && (
+              <div className="demo-credentials">
+                <p>
+                  { `${t('login.demoAccount')} ` }
+                  <strong>{ DEMO_EMAIL }</strong>
+                  { `${t('login.demoPassword')} ` }
+                  <strong>{ DEMO_PASSWORD }</strong>
+                </p>
+                <button
+                  type="button"
+                  className="button button-secondary"
+                  onClick={ () => {
+                    setEmail(DEMO_EMAIL);
+                    setPassword(DEMO_PASSWORD);
+                  } }
+                >
+                  { t('login.fillDemo') }
+                </button>
+              </div>
+            )
+          }
+
+          <form className="login-form" onSubmit={ login } noValidate>
+            <label htmlFor="login-email">{ t('login.email') }</label>
             <input
-              className="login__login_input"
-              type="text"
+              id="login-email"
+              type="email"
+              autoComplete="username"
               value={ email }
               onChange={ ({ target: { value } }) => setEmail(value) }
+              aria-describedby={ error ? 'login-error' : undefined }
               data-testid="login__login_input"
-              placeholder="Login"
             />
-          </label>
-          <label htmlFor="password-input">
+            <label htmlFor="login-password">{ t('login.password') }</label>
             <input
+              id="login-password"
               type="password"
+              autoComplete="current-password"
               value={ password }
               onChange={ ({ target: { value } }) => setPassword(value) }
+              aria-describedby={ error ? 'login-error' : undefined }
               data-testid="login__password_input"
-              placeholder="Senha"
             />
-          </label>
-          {
-            (DEMO_EMAIL && DEMO_PASSWORD)
-              ? (
-                <p className="demo-credentials">
-                  { `Login de demonstração: ${DEMO_EMAIL} / ${DEMO_PASSWORD}` }
+            {
+              (error) && (
+                <p
+                  id="login-error"
+                  className="form-error"
+                  role="alert"
+                  data-testid="login__input_invalid_login_alert"
+                >
+                  { t(error) }
                 </p>
               )
-              : null
-          }
-          {
-            (failedTryLogin)
-              ? (
-                <p data-testid="login__input_invalid_login_alert">
-                  {
-                    `O endereço de e-mail ou a senha não estão corretos.
-                    Por favor, tente novamente.`
-                  }
-                </p>
-              )
-              : null
-          }
-          <button
-            data-testid="login__login_btn"
-            type="submit"
-            onClick={ (event) => login(event) }
-          >
-            Entrar
-          </button>
-        </form>
-      </section>
+            }
+            <button
+              className="button button-primary"
+              data-testid="login__login_btn"
+              type="submit"
+              disabled={ submitting || !email || !password }
+            >
+              { submitting ? t('login.submitting') : t('login.submit') }
+            </button>
+          </form>
+        </section>
+      </main>
     </>
   );
 };

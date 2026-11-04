@@ -4,15 +4,16 @@ A REST API for a football league: teams, matches and live standings, with JWT lo
 
 ## Live demo
 
-Try it at **https://tfc-gabrielncorreia.vercel.app**. The login page shows a demo account (`user@user.com`) that can create, edit and finish matches. The demo data is restored every night at about midnight, Brasília time, so anything you change disappears by the next day.
+Try it at **https://tfc-gabrielncorreia.vercel.app**. The login page shows a demo admin account (`admin@admin.com`) that can create, edit and finish matches. The demo data is restored every night at about midnight, Brasília time, so anything you change disappears by the next day.
 
 The first request after a quiet period can take a few seconds while the API and the database wake up.
 
 ## Features
 
-- Login with JWT; creating and editing matches requires a valid token
+- Login with JWT and role-based access: only admins can create, edit and finish matches; other users get a read-only view
 - List teams and matches, with a filter for matches in progress
 - Create matches, update the score while they are in progress, and finish them
+- Interface in Portuguese and English, following the browser language, with a switch in the header
 - League tables computed from the results: overall, home games only and away games only, ranked by points, wins, goal difference, goals scored and goals conceded
 
 ## Stack
@@ -33,9 +34,9 @@ The first request after a quiet period can take a few seconds while the API and 
 | `GET` | `/teams` | List all teams |
 | `GET` | `/teams/:id` | Get one team |
 | `GET` | `/matches` | List matches; `?inProgress=true` or `false` filters them |
-| `POST` | `/matches` | Create a match (token required) |
-| `PATCH` | `/matches/:id` | Update a match's score (token required) |
-| `PATCH` | `/matches/:id/finish` | Finish a match (token required) |
+| `POST` | `/matches` | Create a match (admin token required) |
+| `PATCH` | `/matches/:id` | Update a match's score (admin token required) |
+| `PATCH` | `/matches/:id/finish` | Finish a match (admin token required) |
 | `GET` | `/leaderboard` | Overall standings |
 | `GET` | `/leaderboard/home` | Standings from home games |
 | `GET` | `/leaderboard/away` | Standings from away games |
@@ -72,7 +73,7 @@ The front end and the API are two Vercel projects built from this repository, wi
 | `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, `DB_NAME` | API | Database connection; required in production |
 | `DB_SSL` | API | `true` turns on verified TLS, which TiDB Cloud requires |
 | `JWT_SECRET` | API | Signs login tokens; the API refuses to start without it |
-| `ADMIN_PASSWORD`, `USER_PASSWORD` | API | Passwords of the seeded accounts in production |
+| `ADMIN_PASSWORD`, `USER_PASSWORD` | API | Passwords of the seeded accounts in production; `ADMIN_PASSWORD` is the public demo password |
 | `CRON_SECRET` | API | Protects `/demo/reset`; Vercel sends it with each cron call |
 | `CORS_ORIGINS` | API | Comma-separated front-end origins allowed to call the API |
 | `NODE_ENV` | API | `production` makes missing settings fail instead of using local defaults |
