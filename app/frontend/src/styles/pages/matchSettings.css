@@ -1,117 +1,176 @@
-.match-settings-section {
-  align-items: center;
+.match-editor {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-panel);
+  padding: var(--space-6);
+}
+
+.match-editor-sides {
+  align-items: end;
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.match-editor-side {
+  border: none;
   display: flex;
   flex-direction: column;
-  height: 83vh;
-  justify-content: center;
+  gap: var(--space-4);
+  min-width: 0;
 }
 
-.match-settings-form {
-  align-items: center;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+.match-editor-side legend {
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.match-editor-side select {
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-control);
+  font-weight: 600;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  width: 100%;
+}
+
+.match-editor-team {
+  font-size: var(--text-lg);
+  font-stretch: 85%;
+  font-weight: 750;
+  line-height: 1.2;
+  min-height: 44px;
+}
+
+/* The two goal counters meet in the middle, like one scoreboard split by the ×. */
+.match-editor-side-home {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.match-editor-side legend {
+  width: 100%;
+}
+
+.match-editor-versus {
+  color: var(--ink-muted);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 52px;
+}
+
+/* Goal stepper: the number sits in the same scoreboard box used in the match list. */
+.goal-stepper label {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+
+.goal-stepper-controls {
+  align-items: stretch;
   display: flex;
-  flex-direction: column;
-  height: 409px;
-  justify-content: space-evenly;
-  width: 865px;
+  gap: var(--space-2);
 }
 
-.match-settings-form label {
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  margin: 0 10px;
-  width: min-content;
-}
-
-.match-settings-form-options {
-  align-items: center;
-  display: flex;
-}
-
-.match-settings-form-options label p {
-  color: #29313d;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 700;
-  height: 19px;
-  line-height: 19px;
-  margin: 15px 0;
+.goal-stepper input {
+  appearance: textfield;
+  background: var(--pine-900);
+  border: none;
+  border-radius: 4px;
+  color: var(--on-dark);
+  font-size: var(--text-2xl);
+  font-stretch: 70%;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
   text-align: center;
+  width: 4.5rem;
 }
 
-.match-settings-form-options label select, .match-settings-form-options label input {
-  background: white;
-  border: 1px solid #c5c9ce;
-  border-radius: 8px;
+.goal-stepper input::-webkit-inner-spin-button,
+.goal-stepper input::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
 }
 
-.match-settings-form-options label select {
+.goal-stepper-button {
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-control);
   cursor: pointer;
-  height: 45px;
-  padding: 12px 16px;
-  width: 268px;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  min-height: 52px;
+  width: 44px;
 }
 
-.match-settings-form-options label input {
-  height: 45px;
-  text-align: center;
-  width: 60px;
+.goal-stepper-button:hover:not(:disabled) {
+  background: var(--grass-100);
+  border-color: var(--grass-600);
 }
 
-.match-settings-form-buttons button {
-  border: 1px solid #003be5;
-  border-radius: 8px;
-  cursor: pointer;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 16px;
-  font-style: normal;
-  height: 40px;
-  line-height: 150%;
-  text-align: center;
-  width: 164px;
+.goal-stepper-button:active:not(:disabled) {
+  transform: scale(0.95);
 }
 
-.match-settings-form-buttons button:disabled {
+.goal-stepper-button:disabled {
   cursor: not-allowed;
+  opacity: 0.45;
 }
 
-.match-settings-form-buttons button:nth-child( 1 ) {
-  background: white;
-  color: #003be5;
-  margin-right: 5px;
-}
-
-.match-settings-form-buttons button:nth-child( 2 ) {
-  background: #003be5;
-  color: white;
-  margin-left: 5px;
-}
-
-.match-settings-form-buttons button:nth-child( 1 ):hover {
-  background: #f0f2f5;
-}
-
-.match-settings-form-buttons button:nth-child( 2 ):hover {
-  background: #002799;
-}
-
-.match-settings-form-versus {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.match-settings-form-versus span:nth-child( 1 ) {
-  flex-grow: 2;
-}
-
-.match-settings-form-versus span:nth-child( 2 ) {
+.match-editor-footer {
   align-items: center;
+  border-top: 1px solid var(--rule);
   display: flex;
-  flex-grow: 1;
-  font-weight: 700;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  justify-content: space-between;
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+}
+
+.match-editor-message {
+  color: var(--grass-700);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  max-width: 40ch;
+  min-height: 1.5em;
+}
+
+.match-editor-message.is-error {
+  color: var(--danger);
+}
+
+.match-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
+@media (max-width: 36rem) {
+  .match-editor {
+    padding: var(--space-4);
+  }
+
+  .match-editor-sides {
+    grid-template-columns: 1fr;
+  }
+
+  .match-editor-versus {
+    display: none;
+  }
+
+  .match-editor-side-home {
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .match-editor-actions,
+  .match-editor-actions .button {
+    width: 100%;
+  }
 }

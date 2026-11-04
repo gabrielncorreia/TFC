@@ -1,46 +1,63 @@
-import React, { useState, useEffect } from 'react';
-import GamesTable from '../components/GamesTable';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Header from '../components/Header';
-import AddNewMatchBtn from '../components/AddNewMatchBtn';
-import LeaderboardBtn from '../components/LeaderboardBtn';
-import LoginBtn from '../components/LoginBtn';
-import GamerFilter from '../components/GameFilter';
+import MatchList from '../components/MatchList';
+import SegmentedControl from '../components/SegmentedControl';
+import { useTranslation } from '../i18n';
 import '../styles/pages/games.css';
 
-const Games = () => {
-  const [currentFilter, setCurrentFilter] = useState('Status do Jogo');
-  const [isAdm, setIsAdm] = useState(false);
-  const [logged, setLogin] = useState(false);
+const FILTERS = [
+  { value: '/matches', labelKey: 'matches.filterAll' },
+  { value: '/matches?inProgress=true', labelKey: 'matches.filterLive' },
+  { value: '/matches?inProgress=false', labelKey: 'matches.filterFinished' },
+];
 
-  useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user')) || {};
-    if (user.token) setLogin(true);
-    if (user.role === 'admin') setIsAdm(true);
-  }, []);
+const Games = () => {
+  const { t } = useTranslation();
+  const [user] = useState(() => JSON.parse(localStorage.getItem('user')) || {});
+  const [logged, setLogin] = useState(Boolean(user.token));
+  const [endpoint, setEndpoint] = useState(FILTERS[0].value);
+  const isAdm = logged && user.role === 'admin';
 
   return (
     <>
-      <Header
-        page="PARTIDAS"
-        FirstNavigationLink={ LeaderboardBtn }
-        SecondNavegationLink={ LoginBtn }
-        logged={ logged }
-        setLogin={ setLogin }
-      />
-      <section className="games-section">
-        <div className="games-handlers">
-          <GamerFilter
-            currentFilter={ currentFilter }
-            setCurrentFilter={ setCurrentFilter }
-          />
+      <Header logged={ logged } setLogin={ setLogin } />
+      <main className="page">
+        <div className="page-heading">
+          <div>
+            <h1 data-testid="header__title">{ t('matches.title') }</h1>
+            <p className="page-lede">
+              {
+                (logged && !isAdm)
+                  ? t('matches.readOnly')
+                  : t('matches.lede')
+              }
+            </p>
+          </div>
           {
-            (isAdm)
-              ? <AddNewMatchBtn />
-              : null
+            (isAdm) && (
+              <Link
+                className="button button-primary"
+                data-testid="header__add_match_btn"
+                to="/matches/settings"
+              >
+                { t('matches.add') }
+              </Link>
+            )
           }
         </div>
-        <GamesTable currentFilter={ currentFilter } isAdm={ isAdm } />
-      </section>
+        <div className="matches-filter">
+          <SegmentedControl
+            name="match-filter"
+            legend={ t('matches.filterLegend') }
+            options={ FILTERS.map(({ value, labelKey }) => ({ value, label: t(labelKey) })) }
+            value={ endpoint }
+            onChange={ setEndpoint }
+            testId="matches__option_show_finish_matches"
+          />
+        </div>
+        <MatchList endpoint={ endpoint } isAdm={ isAdm } />
+      </main>
     </>
   );
 };

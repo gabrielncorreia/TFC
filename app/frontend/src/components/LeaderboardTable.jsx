@@ -1,155 +1,153 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { requestData } from '../services/requests';
-import Loading from './Loading';
+import useRequest from '../services/useRequest';
+import { useTranslation } from '../i18n';
+import RequestError from './RequestError';
 import '../styles/components/leaderboardTable.css';
 
-const LeaderboardTable = ({ currentFilter }) => {
-  const [leaderboard, setLeaderboard] = useState([]);
+const COLUMNS = [
+  { key: 'totalPoints', testId: 'total_points' },
+  { key: 'totalGames', testId: 'total_games' },
+  { key: 'totalVictories', testId: 'total_victories' },
+  { key: 'totalDraws', testId: 'total_draws' },
+  { key: 'totalLosses', testId: 'total_looses' },
+  { key: 'goalsFavor', testId: 'goals_favor', wide: true },
+  { key: 'goalsOwn', testId: 'goals_own', wide: true },
+  { key: 'goalsBalance', testId: 'goals_balance' },
+  { key: 'efficiency', testId: 'efficiency', optional: true },
+];
 
-  const getLeaderboard = (endpoint) => requestData(endpoint)
-    .then((response) => setLeaderboard(response))
-    .catch((error) => console.log(error));
+const ZONE_SIZE = 4;
 
-  useEffect(() => {
-    const apiLeaderboard = '/leaderboard';
-    const apiLeaderboardHome = '/leaderboard/home';
-    const apiLeaderboardAway = '/leaderboard/away';
-    switch (currentFilter) {
-    case 'Classificação Mandantes':
-      getLeaderboard(apiLeaderboardHome);
-      break;
-    case 'Classificação Visitantes':
-      getLeaderboard(apiLeaderboardAway);
-      break;
-    default:
-      getLeaderboard(apiLeaderboard);
-      break;
-    }
-  }, [currentFilter]);
-
-  useEffect(() => {
-    const endpoint = '/leaderboard';
-
-    if (leaderboard.length === 0) {
-      getLeaderboard(endpoint);
-    }
-  }, [leaderboard]);
-
-  if (!leaderboard.length) {
-    return (<Loading />);
+const formatValue = (key, value, locale) => {
+  if (key === 'goalsBalance' && value > 0) return `+${value}`;
+  if (key === 'goalsBalance' && value < 0) return `−${Math.abs(value)}`;
+  if (key === 'efficiency') {
+    return Number(value).toLocaleString(locale, { maximumFractionDigits: 1 });
   }
+  return value;
+};
+
+const zoneOf = (index, total) => {
+  if (total <= ZONE_SIZE * 2) return '';
+  if (index < ZONE_SIZE) return 'zone-top';
+  if (index >= total - ZONE_SIZE) return 'zone-bottom';
+  return '';
+};
+
+const TableSkeleton = ({ label }) => (
+  <div className="standings" aria-busy="true" aria-label={ label }>
+    {
+      Array.from({ length: 8 }, (_, row) => (
+        <div className="standings-skeleton-row" key={ row }>
+          <span className="skeleton" style={ { width: '1.75rem' } } />
+          <span className="skeleton" style={ { width: `${9 + ((row * 3) % 6)}rem` } } />
+          <span className="skeleton" style={ { marginLeft: 'auto', width: '12rem' } } />
+        </div>
+      ))
+    }
+  </div>
+);
+
+TableSkeleton.propTypes = {
+  label: PropTypes.string.isRequired,
+};
+
+const LeaderboardTable = ({ endpoint }) => {
+  const { t, locale } = useTranslation();
+  const { status, data, retry } = useRequest(endpoint);
+
+  if (status === 'error') {
+    return <RequestError message={ t('leaderboard.loadError') } retry={ retry } />;
+  }
+  if (!data.length) return <TableSkeleton label={ t('leaderboard.loading') } />;
 
   return (
-    <section className="score-board-table-section">
-      <table className="score-board-table">
-        <thead>
-          <tr>
-            <th data-testid="score_boarding__classification">Classificação</th>
-            <th data-testid="score_boarding__team_name">Time</th>
-            <th data-testid="score_boarding__total_points">P</th>
-            <th data-testid="score_boarding__total_games">J</th>
-            <th data-testid="score_boarding__total_victories">V</th>
-            <th data-testid="score_boarding__total_draws">E</th>
-            <th data-testid="score_boarding__total_looses">D</th>
-            <th data-testid="score_boarding__goals_favor">GP</th>
-            <th data-testid="score_boarding__goals_own">GC</th>
-            <th data-testid="score_boarding__goals_balance">SG</th>
-            <th data-testid="score_boarding__efficiency">%</th>
-          </tr>
-        </thead>
-        <tbody>
-          {
-            leaderboard.map(({
-              name,
-              totalPoints,
-              totalGames,
-              totalVictories,
-              totalDraws,
-              totalLosses,
-              goalsFavor,
-              goalsOwn,
-              goalsBalance,
-              efficiency,
-            },
-            index) => (
-              <tr key={ name }>
-                <td
-                  className="score-board-classification"
-                  data-testid={ `score_boarding__classification_${index + 1}` }
-                >
-                  {`${index + 1}`}
-                </td>
-                <td
-                  className="score-board-team-name"
-                  data-testid={ `score_boarding__team_name_${index + 1}` }
-                >
-                  {name}
-                </td>
-                <td
-                  className="score-board-total-points"
-                  data-testid={ `score_boarding__total_points_${index + 1}` }
-                >
-                  { totalPoints }
-                </td>
-                <td
-                  className="score-board-total-games"
-                  data-testid={ `score_boarding__total_games_${index + 1}` }
-                >
-                  { totalGames }
-                </td>
-                <td
-                  className="score-board-total-victories"
-                  data-testid={ `score_boarding__total_victories_${index + 1}` }
-                >
-                  { totalVictories }
-                </td>
-                <td
-                  className="score-board-total-draws"
-                  data-testid={ `score_boarding__total_draws_${index + 1}` }
-                >
-                  { totalDraws }
-                </td>
-                <td
-                  className="score-board-total-looses"
-                  data-testid={ `score_boarding__total_looses_${index + 1}` }
-                >
-                  { totalLosses }
-                </td>
-                <td
-                  className="score-board-goals-favor"
-                  data-testid={ `score_boarding__goals_favor_${index + 1}` }
-                >
-                  { goalsFavor }
-                </td>
-                <td
-                  className="score-board-goals-own"
-                  data-testid={ `score_boarding__goals_own_${index + 1}` }
-                >
-                  { goalsOwn }
-                </td>
-                <td
-                  className="score-board-goals-balance"
-                  data-testid={ `score_boarding__goals_balance_${index + 1}` }
-                >
-                  { goalsBalance }
-                </td>
-                <td
-                  className="score-board-efficiency"
-                  data-testid={ `score_boarding__efficiency_${index + 1}` }
-                >
-                  { efficiency }
-                </td>
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </section>
+    <>
+      <div className="standings" aria-busy={ status === 'loading' }>
+        <table className="standings-table">
+          <thead>
+            <tr>
+              <th scope="col" data-testid="score_boarding__classification">
+                <abbr title={ t('leaderboard.position') }>#</abbr>
+              </th>
+              <th scope="col" className="standings-team" data-testid="score_boarding__team_name">
+                { t('leaderboard.team') }
+              </th>
+              {
+                COLUMNS.map(({ key, testId, wide, optional }) => {
+                  const [abbr, title] = t(`leaderboard.columns.${key}`);
+                  return (
+                    <th
+                      scope="col"
+                      key={ key }
+                      className={ [wide && 'standings-wide', optional && 'standings-optional'].filter(Boolean).join(' ') || undefined }
+                      data-testid={ `score_boarding__${testId}` }
+                    >
+                      <abbr title={ title }>{ abbr }</abbr>
+                    </th>
+                  );
+                })
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {
+              data.map((team, index) => (
+                <tr key={ team.name }>
+                  <td data-testid={ `score_boarding__classification_${index + 1}` }>
+                    <span className={ `position ${zoneOf(index, data.length)}` }>
+                      { index + 1 }
+                    </span>
+                  </td>
+                  <th
+                    scope="row"
+                    className="standings-team"
+                    data-testid={ `score_boarding__team_name_${index + 1}` }
+                  >
+                    { team.name }
+                  </th>
+                  {
+                    COLUMNS.map(({ key, testId, wide, optional }) => (
+                      <td
+                        key={ key }
+                        className={ [
+                          key === 'totalPoints' ? 'standings-points' : '',
+                          wide ? 'standings-wide' : '',
+                          optional ? 'standings-optional' : '',
+                        ].join(' ').trim() || undefined }
+                        data-testid={ `score_boarding__${testId}_${index + 1}` }
+                      >
+                        { formatValue(key, team[key], locale) }
+                      </td>
+                    ))
+                  }
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+      {
+        (data.length > ZONE_SIZE * 2) && (
+          <ul className="standings-legend">
+            <li>
+              <span className="legend-swatch zone-top" aria-hidden="true" />
+              { t('leaderboard.legendTop') }
+            </li>
+            <li>
+              <span className="legend-swatch zone-bottom" aria-hidden="true" />
+              { t('leaderboard.legendBottom') }
+            </li>
+          </ul>
+        )
+      }
+    </>
   );
 };
 
 LeaderboardTable.propTypes = {
-  currentFilter: PropTypes.string.isRequired,
+  endpoint: PropTypes.string.isRequired,
 };
+
 export default LeaderboardTable;

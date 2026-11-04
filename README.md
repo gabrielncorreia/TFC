@@ -13,6 +13,7 @@ The first request after a quiet period can take a few seconds while the API and 
 - Login with JWT and role-based access: only admins can create, edit and finish matches; other users get a read-only view
 - List teams and matches, with a filter for matches in progress
 - Create matches, update the score while they are in progress, and finish them
+- Interface in Portuguese and English, following the browser language, with a switch in the header
 - League tables computed from the results: overall, home games only and away games only, ranked by points, wins, goal difference, goals scored and goals conceded
 
 ## Stack

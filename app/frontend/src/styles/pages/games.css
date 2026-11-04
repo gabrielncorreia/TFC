@@ -1,201 +1,134 @@
-.games-handlers {
+.matches-filter {
+  margin-bottom: var(--space-4);
+}
+
+.match-list {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-panel);
+  list-style: none;
+  transition: opacity 150ms var(--ease-out);
+}
+
+.match-list[aria-busy='true'] {
+  opacity: 0.6;
+}
+
+/* Status | home team | scoreboard | away team | action. The scoreboard stays centered. */
+.match-row {
   align-items: center;
-  display: flex;
-  justify-content: space-between;
-  min-width: 1100px;
-  padding: 20px 50px;
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: 8rem 1fr auto 1fr 9rem;
+  padding: var(--space-3) var(--space-4);
 }
 
-.games-handlers form {
-  display: flex;
+.match-row + .match-row {
+  border-top: 1px solid var(--rule);
 }
 
-.games-handlers form label {
-  color: #3d495c;
-  display: flex;
-  flex-direction: column;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 150%;
-}
-
-.games-handlers form label select {
-  background: white;
-  border: none;
-  border-bottom: 1px solid #3d495c;
-  color: #c5c9ce;
-  cursor: pointer;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 14px;
-  font-style: normal;
-  height: 40px;
-  width: 288px;
-}
-
-.games-table-tbody-status button {
-  background: white;
-  border: none;
-  cursor: pointer;
-  margin-left: 10px;
-}
-
-.games-handlers form button {
-  align-self: flex-end;
-  background: #003be5;
-  border: 1px solid #003be5;
-  border-radius: 8px;
-  color: white;
-  cursor: pointer;
-  flex-grow: 0;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 16px;
-  font-style: normal;
-  height: 40px;
-  line-height: 150%;
-  margin: 0 20px;
-  width: 164px;
-}
-
-.games-table button:disabled {
-  cursor: not-allowed;
-}
-
-.games-handlers form button:hover {
-  background: #002799;
-}
-
-.add-new-game-button {
-  color: #29313d;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 19px;
-  text-decoration-line: underline;
-}
-
-.games-table {
-  display: flex;
-  flex-direction: column;
-  padding: 20px 50px;
-}
-
-.games-table thead, .games-table tbody {
-  min-width: 1100px;
-}
-
-.games-table thead tr {
+.match-status {
   align-items: center;
-  background: #f0f2f5;
-  border-radius: 10px;
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+  color: var(--ink-muted);
   display: flex;
-  height: 43px;
-  justify-content: space-around;
-  margin: 10px 0;
-  padding: 0 10px;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  gap: var(--space-2);
 }
 
-.games-table-thead-home-team, .games-table-thead-away-team {
-  margin: 0 20px;
-  width: 268px;
+.match-status.is-live {
+  color: var(--live);
 }
 
-.games-table-thead-versus {
-  height: 15px;
-  width: 15px;
+.match-status.is-live::before {
+  animation: live-pulse 1.6s ease-in-out infinite;
+  background: var(--live);
+  border-radius: 50%;
+  content: '';
+  height: 0.5rem;
+  width: 0.5rem;
 }
 
-.games-table-thead-goals {
-  margin: 0 20px;
-  width: 50px;
+@keyframes live-pulse {
+  50% { opacity: 0.3; }
 }
 
-.games-table-thead-empty-space, .games-table-tbody-empty-space {
-  flex-grow: 2;
+.match-team {
+  font-weight: 600;
+  overflow-wrap: break-word;
 }
 
-.games-table-thead-status {
-  margin: 0 20px;
-  width: 192px;
+.match-team-home {
+  text-align: right;
 }
 
-.games-table tbody tr {
-  align-items: center;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.1);
+/* The memorable bit: stadium-scoreboard numerals in condensed heavy Archivo. */
+.match-score {
   display: flex;
-  height: 86px;
-  justify-content: space-around;
-  margin: 10px 0;
-  padding: 15px;
+  gap: 3px;
 }
 
-.games-table-tbody-home-team, .games-table-tbody-away-team {
-  border: 1px solid #036b52;
-  border-radius: 8px;
-  color: #036b52;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 14px;
-  font-style: normal;
-  height: 45px;
-  justify-content: center;
-  left: 101px;
-  margin: 0 20px;
-  padding: 12px 16px;
+.match-score span[aria-hidden] {
+  background: var(--pine-900);
+  border-radius: 4px;
+  color: var(--on-dark);
+  font-size: var(--text-xl);
+  font-stretch: 70%;
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  line-height: 1;
+  min-width: 2.75rem;
+  padding: var(--space-2) var(--space-1);
   text-align: center;
-  width: 268px;
 }
 
-.games-table-tbody-versus {
-  color: #3d495c;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 700;
-  line-height: 19px;
-  text-align: center;
-  width: 15px;
-}
-
-.games-table-tbody-home-team-goals, .games-table-tbody-away-team-goals {
-  background: #f0f2f5;
-  border: 1px solid #3d495c;
-  border-radius: 8px;
-  height: 45px;
-  margin: 0 20px;
-  padding: 12px 16px;
-  text-align: center;
-  width: 50px;
-}
-
-.games-table-tbody-status {
-  align-items: center;
+.match-action {
   display: flex;
-  margin: 0 20px;
+  justify-content: flex-end;
+  min-height: 44px;
 }
 
-.game-status {
-  border: 1px solid #e1e5eb;
-  border-radius: 8px;
-  color: white;
-  font-family: Verdana , Tahoma , sans-serif;
-  font-size: 15px;
-  font-style: normal;
-  font-weight: 700;
-  height: 48px;
-  padding: 12px 16px;
-  text-align: center;
-  width: 164px;
+.match-action .button {
+  font-size: var(--text-sm);
+  padding: 0 var(--space-3);
 }
 
-.in-progress {
-  background: #b01726;
+.match-skeleton-team {
+  width: 100%;
 }
 
-.finished-game {
-  background: #036b52;
+/* Phones: teams stacked with their score box on the right, like a sports app. */
+@media (max-width: 44rem) {
+  .match-row {
+    column-gap: var(--space-3);
+    grid-template-areas:
+      'status action'
+      'home home-score'
+      'away away-score';
+    grid-template-columns: 1fr auto;
+    row-gap: var(--space-1);
+  }
+
+  .match-status { grid-area: status; }
+  .match-action { grid-area: action; min-height: 0; }
+  .match-team-home { grid-area: home; text-align: left; }
+  .match-team-away { grid-area: away; }
+  .match-score { display: contents; }
+  .match-score .score-home { grid-area: home-score; }
+  .match-score .score-away { grid-area: away-score; }
+
+  .match-score span[aria-hidden] {
+    font-size: var(--text-lg);
+    justify-self: end;
+    min-width: 2.25rem;
+    padding: var(--space-1);
+  }
+
+  .match-action .button {
+    min-height: 36px;
+  }
+
+  .match-row > .skeleton {
+    grid-area: auto;
+  }
 }
