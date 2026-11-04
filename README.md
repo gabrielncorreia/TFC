@@ -18,12 +18,49 @@ The first request after a quiet period can take a few seconds while the API and 
 
 ## Stack
 
-- **Back end:** Node.js, Express and TypeScript, layered into routes, controllers, services and Sequelize models
+- **Front end:** React 17 with React Router, its own design in plain CSS, and Portuguese and English translations
+- **Back end:** Node.js, Express and TypeScript, layered into routes, middlewares, controllers, services and Sequelize models
 - **Database:** MySQL, with schema and seed data managed by Sequelize migrations and seeders
-- **Auth:** JSON Web Tokens
-- **Tests:** integration tests with Mocha, Chai and Sinon
-- **Infrastructure:** Docker Compose runs the front end, the API and MySQL together locally
-- **Hosting:** the front end and the API on Vercel, the database on TiDB Cloud (MySQL-compatible)
+- **Auth:** JSON Web Tokens signed with HS256, bcrypt password hashes and role checks
+- **Tests:** API integration and unit tests with Mocha, Chai and Sinon; translation tests with Jest
+- **Local setup:** Docker Compose runs the front end, the API and MySQL together
+- **Hosting:** Vercel for the front end and the API, TiDB Cloud for the database
+
+## Architecture
+
+```
+Browser
+  │  https://tfc-gabrielncorreia.vercel.app
+  ▼
+Front end (Vercel, static files on its CDN)
+  │  HTTPS + JSON, Authorization: <JWT>
+  ▼
+API (Vercel Function running the Express app, region iad1)
+  │  MySQL protocol over verified TLS
+  ▼
+Database (TiDB Cloud Starter, AWS us-east-1)
+
+Vercel cron, daily at 03:00 UTC ──► GET /demo/reset on the API
+```
+
+| Piece | Where it runs | What it does |
+| --- | --- | --- |
+| Front end (`app/frontend`) | Vercel, as static files | Shows the standings, the matches and the score editor. It reads the API address and the demo login at build time, keeps the login token in `localStorage` and sends it with every request. |
+| API (`app/backend`) | Vercel, where the Express app runs as one serverless function | Answers the REST routes below. Middlewares check the token, the admin role and the input; controllers then call the services, which compute the standings and use Sequelize to read and write the database. |
+| Database | TiDB Cloud Starter, a MySQL-compatible serverless database | Stores the users, the 16 teams and the matches. Its tables come from the Sequelize migrations. |
+| Nightly reset | A Vercel cron job calling `GET /demo/reset` | Restores the seeded users, teams and matches in one transaction, so visitors can edit freely and the demo starts clean every day. The route only runs with the `CRON_SECRET` header. |
+| Local stack (`app/docker-compose.yml`) | Docker on your machine | Runs the front end, the API and MySQL 8 together, and reseeds the database on start. |
+
+A request such as `PATCH /matches/7` arrives with the token. The API checks that the token is valid and that its role is `admin`, then updates the match through Sequelize. The standings are not stored: they are calculated from the finished matches every time someone opens them.
+
+Security in production:
+
+- Passwords are checked against bcrypt hashes. Unknown emails are compared against a dummy hash, so response times do not reveal which accounts exist.
+- Tokens carry only the email and the role, are signed with a secret from the environment and expire after a day.
+- Only admins can create, edit and finish matches; other accounts get `403`.
+- CORS allows only the front end's address, and login is limited to 10 attempts per IP every 15 minutes.
+- The API refuses to start without its database settings or token secret, and clients only ever see a generic `500` for server errors.
+- Secrets live in Vercel's environment settings, never in the repository.
 
 ## API
 
@@ -46,7 +83,7 @@ Login is limited to 10 attempts per IP address every 15 minutes.
 
 ## About the project
 
-Built individually at [Trybe](https://www.betrybe.com/), which provided the front end. The API, the database models, migrations and seeders, the Docker setup and the tests are mine.
+Built individually at [Trybe](https://www.betrybe.com/), which provided the original front end. The API, the database models, migrations and seeders, the Docker setup and the tests are mine, as are the front-end redesign, the translations and the deployment on Vercel and TiDB Cloud.
 
 ## Running locally
 
