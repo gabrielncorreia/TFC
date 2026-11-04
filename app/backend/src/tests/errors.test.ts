@@ -1,6 +1,6 @@
 import * as sinon from 'sinon';
-import * as chai from 'chai';
-import * as bcrypt from 'bcryptjs';
+import chai = require('chai');
+import bcrypt = require('bcryptjs');
 import chaiHttp = require('chai-http');
 
 import { app } from '../app';

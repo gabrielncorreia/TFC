@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as bcrypt from 'bcryptjs';
+import bcrypt = require('bcryptjs');
 import JWT from '../middlewares/jwt';
 import Service from '../service/service';
 import resetDemo from '../service/demoReset';
